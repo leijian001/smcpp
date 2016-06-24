@@ -21,7 +21,7 @@ namespace SM
 #endif
 
 #ifndef SM_MAX_NEST_DEPTH
-#define SM_MAX_NEST_DEPTH 		6
+#define SM_MAX_NEST_DEPTH 		8
 #endif
 
 #if CONFIG_SM_DEBUG
@@ -166,6 +166,11 @@ public:
 			m_state = m_temp;
 		}
 	}
+
+	static Fsm *fsm_entry(SMAttr *p)
+	{
+		return static_cast<Fsm *>(p);
+	}
 };
 #endif
 
@@ -300,6 +305,11 @@ public:
 
 		m_temp = t;
 		m_state = t;
+	}
+
+	static Hsm *hsm_entry(SMAttr *p)
+	{
+		return static_cast<Hsm *>(p);
 	}
 
 	//! 层次状态机根状态

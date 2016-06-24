@@ -33,6 +33,7 @@ private:
 
 	static int top(SM::SMAttr *const hsm, SM::Event *const e)
 	{
+		A *const p = static_cast<A *>(SM::Hsm::hsm_entry(hsm));
 
 		switch(e->sig)
 		{
