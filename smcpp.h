@@ -133,7 +133,7 @@ public:
 		m_temp = init;
 	}
 
-	int initial(Event *const e = 0)
+	int start(Event *const e = 0)
 	{
 		int ret;
 
@@ -186,7 +186,7 @@ public:
 		m_temp  = init;
 	}
 
-	void initial(Event *const e = 0)
+	void start(Event *const e = 0)
 	{
 		int ret;
 		int ip;
