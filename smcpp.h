@@ -79,7 +79,7 @@ typedef int (*StateHander)(SMAttr *const sm, Event *const e);
 
 class SMAttr
 {
-public:
+private:
 	StateHander m_state;
 	StateHander m_temp;
 
@@ -97,6 +97,7 @@ public:
 	}
 
 
+public:
 	inline int handled(void)
 	{
 		return RET_HANDLED;
@@ -119,10 +120,13 @@ public:
 		m_temp = target;
 		return RET_SUPER;
 	}
+
+	friend class Fsm;
+	friend class Hsm;
 };
 
 #if CONFIG_SM_FSM
-class Fsm: private SMAttr
+class Fsm: public SMAttr
 {
 public:
 	Fsm(StateHander init)
@@ -175,7 +179,7 @@ public:
 #endif
 
 #if CONFIG_SM_HSM
-class Hsm: private SMAttr
+class Hsm: public SMAttr
 {
 public:
 	Hsm(StateHander init)
