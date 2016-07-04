@@ -74,10 +74,10 @@ enum
 	RET_SUPER,
 };
 
-class SMAttr;
-typedef int (*StateHander)(SMAttr *const sm, Event *const e);
+class Attr;
+typedef int (*StateHander)(Attr *const sm, Event *const e);
 
-class SMAttr
+class Attr
 {
 private:
 	StateHander m_state;
@@ -126,7 +126,7 @@ public:
 };
 
 #if CONFIG_SM_FSM
-class Fsm: public SMAttr
+class Fsm: public Attr
 {
 public:
 	Fsm(StateHander init)
@@ -171,7 +171,7 @@ public:
 		}
 	}
 
-	static Fsm *fsm_entry(SMAttr *p)
+	static Fsm *fsm_entry(Attr *p)
 	{
 		return static_cast<Fsm *>(p);
 	}
@@ -179,7 +179,7 @@ public:
 #endif
 
 #if CONFIG_SM_HSM
-class Hsm: public SMAttr
+class Hsm: public Attr
 {
 public:
 	Hsm(StateHander init)
@@ -311,13 +311,13 @@ public:
 		m_state = t;
 	}
 
-	static Hsm *hsm_entry(SMAttr *p)
+	static Hsm *hsm_entry(Attr *p)
 	{
 		return static_cast<Hsm *>(p);
 	}
 
 	//! 层次状态机根状态
-	static int hsm_top(SMAttr *const sm, Event *const e)
+	static int hsm_top(Attr *const sm, Event *const e)
 	{
 		(void)sm;
 		(void)e;

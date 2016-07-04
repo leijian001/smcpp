@@ -25,15 +25,16 @@ public:
 private:
 	int a;
 
-	static int init(SM::SMAttr *const hsm, SM::Event *const e)
+	static int init(SM::Attr *const hsm, SM::Event *const e)
 	{
 		printf("init\n");
 		return hsm->tran(top);
 	}
 
-	static int top(SM::SMAttr *const hsm, SM::Event *const e)
+	static int top(SM::Attr *const hsm, SM::Event *const e)
 	{
-		A *const p = static_cast<A *>(SM::Hsm::hsm_entry(hsm));
+		A *const p = static_cast<A *>(hsm);
+		(void)p;
 
 		switch(e->sig)
 		{
@@ -51,7 +52,7 @@ private:
 		return hsm->supper(hsm_top);
 	}
 
-	static int s0(SM::SMAttr *const hsm, SM::Event *const event)
+	static int s0(SM::Attr *const hsm, SM::Event *const event)
 	{
 		E *e = static_cast<E *>(event);
 
@@ -78,7 +79,7 @@ private:
 		return hsm->supper(top);
 	}
 
-	static int s1(SM::SMAttr *const hsm, SM::Event *const event)
+	static int s1(SM::Attr *const hsm, SM::Event *const event)
 	{
 
 		switch(event->sig)
@@ -107,7 +108,7 @@ private:
 		return hsm->supper(top);
 	}
 
-	static int s2(SM::SMAttr *const hsm, SM::Event *const event)
+	static int s2(SM::Attr *const hsm, SM::Event *const event)
 	{
 		switch(event->sig)
 		{
@@ -122,7 +123,7 @@ private:
 		return hsm->supper(s0);
 	}
 
-	static int s3(SM::SMAttr *const hsm, SM::Event *const event)
+	static int s3(SM::Attr *const hsm, SM::Event *const event)
 	{
 		switch(event->sig)
 		{
