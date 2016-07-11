@@ -47,6 +47,7 @@ class Event
 {
 public:
 	Event(Singal const s): sig(s){}
+	virtual ~Event(){}
 
 	Singal sig;
 };
@@ -79,25 +80,15 @@ typedef int (*StateHander)(Attr *const sm, Event *const e);
 
 class Attr
 {
-private:
-	StateHander m_state;
-	StateHander m_temp;
-
-	inline int trig(StateHander state, Singal sig)
-	{
-		return state(this, const_cast<Event *const>(&RESERVED_EVENT[4+sig]));
-	}
-	inline int entry(StateHander state)
-	{
-		return trig(state, ENTRY_SIG);
-	}
-	inline int exit(StateHander state)
-	{
-		return trig(state, EXIT_SIG);
-	}
-
-
 public:
+	Attr()
+	{
+		m_state = 0;
+		m_temp  = 0;
+		m_last  = m_state;
+	}
+	virtual ~Attr(){}
+
 	inline int handled(void)
 	{
 		return RET_HANDLED;
@@ -113,12 +104,37 @@ public:
 	inline int tran(StateHander target)
 	{
 		m_temp = target;
+		m_last = m_state;
+		return RET_TRAN;
+	}
+	inline int tranLast(void)
+	{
+		m_temp = m_last;
+		m_last = m_state;
 		return RET_TRAN;
 	}
 	inline int supper(StateHander target)
 	{
 		m_temp = target;
 		return RET_SUPER;
+	}
+
+private:
+	StateHander m_state;
+	StateHander m_temp;
+	StateHander m_last;
+
+	inline int trig(StateHander state, Singal sig)
+	{
+		return state(this, const_cast<Event *const>(&RESERVED_EVENT[4+sig]));
+	}
+	inline int entry(StateHander state)
+	{
+		return trig(state, ENTRY_SIG);
+	}
+	inline int exit(StateHander state)
+	{
+		return trig(state, EXIT_SIG);
 	}
 
 	friend class Fsm;
@@ -173,7 +189,7 @@ public:
 
 	static Fsm *fsm_entry(Attr *p)
 	{
-		return static_cast<Fsm *>(p);
+		return dynamic_cast<Fsm *>(p);
 	}
 };
 #endif
@@ -313,15 +329,15 @@ public:
 
 	static Hsm *hsm_entry(Attr *p)
 	{
-		return static_cast<Hsm *>(p);
+		return dynamic_cast<Hsm *>(p);
 	}
 
 	//! 层次状态机根状态
-	static int hsm_top(Attr *const sm, Event *const e)
+	static int hsm_top(Attr *const hsm, Event *const e)
 	{
-		(void)sm;
+		(void)hsm;
 		(void)e;
-		return RET_IGNORE;
+		return hsm->ignore();
 	}
 
 private:
