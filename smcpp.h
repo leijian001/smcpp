@@ -102,7 +102,7 @@ public:
 	{
 		return RET_UNHANDLED;
 	}
-	inline int tran(StateHander target)
+	inline int tran(const StateHander &target)
 	{
 		m_temp = target;
 		m_last = m_state;
@@ -114,7 +114,7 @@ public:
 		m_last = m_state;
 		return RET_TRAN;
 	}
-	inline int supper(StateHander target)
+	inline int supper(const StateHander &target)
 	{
 		m_temp = target;
 		return RET_SUPER;
@@ -125,7 +125,7 @@ private:
 	StateHander m_temp;
 	StateHander m_last;
 
-	inline int trig(StateHander state, Singal sig)
+	inline int trig(const StateHander &state, Singal sig)
 	{
 		return state(*this, const_cast<Event &>(RESERVED_EVENT[4+sig]));
 	}
@@ -146,10 +146,8 @@ private:
 class Fsm: public Attr
 {
 public:
-	Fsm(StateHander init)
+	Fsm(const StateHander &init)
 	{
-		SM_ASSERT(init);
-
 		m_state = 0;
 		m_temp = init;
 	}
@@ -157,8 +155,6 @@ public:
 	int start(Event &e = const_cast<Event &>(RESERVED_EVENT[4+USER_SIG]))
 	{
 		int ret;
-
-		SM_ASSERT(m_temp);
 
 		ret = m_temp(*this, e);
 		if (RET_TRAN != ret)
@@ -199,10 +195,8 @@ public:
 class Hsm: public Attr
 {
 public:
-	Hsm(StateHander init)
+	Hsm(const StateHander &init)
 	{
-		SM_ASSERT(init);
-
 		m_state = hsm_top;
 		m_temp  = init;
 	}
@@ -214,9 +208,6 @@ public:
 
 		StateHander path[SM_MAX_NEST_DEPTH];
 		StateHander t = m_state;
-
-		SM_ASSERT(nullptr != m_temp);
-		SM_ASSERT(hsm_top == t);
 
 		ret = (m_temp)(*this, e);
 		SM_ASSERT(RET_TRAN == ret);
@@ -328,9 +319,9 @@ public:
 		m_state = t;
 	}
 
-	static Hsm *hsm_entry(Attr *p)
+	static Hsm &hsm_entry(Attr &p)
 	{
-		return dynamic_cast<Hsm *>(p);
+		return dynamic_cast<Hsm &>(p);
 	}
 
 	//! 层次状态机根状态
