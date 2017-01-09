@@ -25,117 +25,119 @@ public:
 private:
 	int a;
 
-	static int init(SM::Attr *const hsm, SM::Event *const e)
+	static int init(SM::Attr &hsm, SM::Event &e)
 	{
 		printf("init\n");
-		return hsm->tran(top);
+		return hsm.tran(top);
 	}
 
-	static int top(SM::Attr *const hsm, SM::Event *const e)
+	static int top(SM::Attr &hsm, SM::Event &e)
 	{
-		A *const p = static_cast<A *>(hsm);
+		auto &p = dynamic_cast<A&>(hsm);
 		(void)p;
 
-		switch(e->sig)
+		switch(e.sig)
 		{
 		case SM::ENTRY_SIG:
 			printf("top entry\n");
-			return hsm->handled();
+			return hsm.handled();
 		case SM::EXIT_SIG:
 			printf("top exit\n");
-			return hsm->handled();
+			return hsm.handled();
 		case SM::INIT_SIG:
 			printf("top init\n");
-			return hsm->tran(s0);
+			return hsm.tran(s0);
 		}
 
-		return hsm->supper(hsm_top);
+		return hsm.supper(hsm_top);
 	}
 
-	static int s0(SM::Attr *const hsm, SM::Event *const event)
+	static int s0(SM::Attr &hsm, SM::Event &event)
 	{
-		E *e = static_cast<E *>(event);
 
-		switch(e->sig)
+		switch(event.sig)
 		{
 		case SM::ENTRY_SIG:
 			printf("s0 entry\n");
-			return hsm->handled();
+			return hsm.handled();
 		case SM::EXIT_SIG:
 			printf("s0 exit\n");
-			return hsm->handled();
+			return hsm.handled();
 		case SM::INIT_SIG:
 			printf("s0 init\n");
-			return hsm->tran(s2);
+			return hsm.tran(s2);
 
 		case CHAR_SIG:
-			if ('1' == e->c)
+		{
+			auto e = dynamic_cast<E&>(event);
+			if ('1' == e.c)
 			{
-				return hsm->tran(s1);
+				return hsm.tran(s1);
 			}
-			return hsm->handled();
+			return hsm.handled();
+		}
 		}
 
-		return hsm->supper(top);
+		return hsm.supper(top);
 	}
 
-	static int s1(SM::Attr *const hsm, SM::Event *const event)
+	static int s1(SM::Attr &hsm, SM::Event &event)
 	{
 
-		switch(event->sig)
+		switch(event.sig)
 		{
 		case SM::ENTRY_SIG:
 			printf("s1 entry\n");
-			return hsm->handled();
+			return hsm.handled();
 		case SM::EXIT_SIG:
 			printf("s1 exit\n");
-			return hsm->handled();
+			return hsm.handled();
 		case SM::INIT_SIG:
 			printf("s1 init\n");
-			return hsm->tran(s3);
+			return hsm.tran(s3);
 
 		case CHAR_SIG:
 		{
-			E *e = static_cast<E *>(event);
-			if ('1' == e->c)
+			auto e = dynamic_cast<E&>(event);
+			if ('1' == e.c)
 			{
-				return hsm->tran(s0);
+				return hsm.tran(s0);
 			}
-			return hsm->handled();
+			return hsm.handled();
 		}
 		}
 
-		return hsm->supper(top);
+		return hsm.supper(top);
 	}
 
-	static int s2(SM::Attr *const hsm, SM::Event *const event)
+	static int s2(SM::Attr &hsm, SM::Event &event)
 	{
-		switch(event->sig)
+		switch(event.sig)
 		{
 		case SM::ENTRY_SIG:
 			printf("s2 entry\n");
-			return hsm->handled();
+			return hsm.handled();
 		case SM::EXIT_SIG:
 			printf("s2 exit\n");
-			return hsm->handled();
+			return hsm.handled();
 		}
 
-		return hsm->supper(s0);
+		return hsm.supper(s0);
 	}
 
-	static int s3(SM::Attr *const hsm, SM::Event *const event)
+	static int s3(SM::Attr &hsm, SM::Event &event)
 	{
-		switch(event->sig)
+		switch(event.sig)
 		{
 		case SM::ENTRY_SIG:
 			printf("s3 entry\n");
-			return hsm->handled();
+			return hsm.handled();
 		case SM::EXIT_SIG:
 			printf("s3 exit\n");
-			return hsm->handled();
+			return hsm.handled();
 		}
 
-		return hsm->supper(s1);
+		return hsm.supper(s1);
 	}
 };
 
@@ -155,7 +157,7 @@ int main(int argc, char *argv[])
 			break;
 		}
 
-		a.dispatch(&e);
+		a.dispatch(e);
 	}
 
 	return 0;

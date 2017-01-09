@@ -5,7 +5,7 @@ OBJ := $(SRC:.cpp=.o)
 
 CC := g++
 
-CFLAG := -g
+CFLAG := -g --std=c++11
 
 $(TARGET): $(OBJ)
 	$(CC) -o $(TARGET) $(OBJ)

@@ -2,6 +2,7 @@
 #define __SMCPP_H__
 
 #include <stddef.h>
+#include <assert.h>
 
 namespace SM
 {
@@ -25,7 +26,7 @@ namespace SM
 #endif
 
 #if CONFIG_SM_DEBUG
-#define SM_ASSERT(cond) 	do{ if(!(cond)){ while(1); } }while(0)
+#define SM_ASSERT(cond) 	assert(cond)
 #else
 #define SM_ASSERT(cond) 	/* NULL */
 #endif
@@ -76,7 +77,7 @@ enum
 };
 
 class Attr;
-typedef int (*StateHander)(Attr *const sm, Event *const e);
+typedef int (*StateHander)(Attr &sm, Event &e);
 
 class Attr
 {
@@ -126,7 +127,7 @@ private:
 
 	inline int trig(StateHander state, Singal sig)
 	{
-		return state(this, const_cast<Event *const>(&RESERVED_EVENT[4+sig]));
+		return state(*this, const_cast<Event &>(RESERVED_EVENT[4+sig]));
 	}
 	inline int entry(StateHander state)
 	{
@@ -153,13 +154,13 @@ public:
 		m_temp = init;
 	}
 
-	int start(Event *const e = 0)
+	int start(Event &e = const_cast<Event &>(RESERVED_EVENT[4+USER_SIG]))
 	{
 		int ret;
 
 		SM_ASSERT(m_temp);
 
-		ret = m_temp(this, e);
+		ret = m_temp(*this, e);
 		if (RET_TRAN != ret)
 		{
 			return ret;
@@ -172,13 +173,13 @@ public:
 		return ret;
 	}
 
-	void dispatch(Event *const e)
+	void dispatch(Event &e)
 	{
 		int ret;
 
 		SM_ASSERT(m_state == m_temp);
 
-		ret = m_temp(this, e);
+		ret = m_temp(*this, e);
 		if (ret == RET_TRAN)
 		{
 			exit(m_state);
@@ -187,9 +188,9 @@ public:
 		}
 	}
 
-	static Fsm *fsm_entry(Attr *p)
+	static Fsm &fsm_entry(Attr &p)
 	{
-		return dynamic_cast<Fsm *>(p);
+		return dynamic_cast<Fsm &>(p);
 	}
 };
 #endif
@@ -206,7 +207,7 @@ public:
 		m_temp  = init;
 	}
 
-	void start(Event *const e = 0)
+	void start(Event &e = const_cast<Event &>(RESERVED_EVENT[4+USER_SIG]))
 	{
 		int ret;
 		int ip;
@@ -214,10 +215,10 @@ public:
 		StateHander path[SM_MAX_NEST_DEPTH];
 		StateHander t = m_state;
 
-		SM_ASSERT(0 != m_temp);
+		SM_ASSERT(nullptr != m_temp);
 		SM_ASSERT(hsm_top == t);
 
-		ret = (m_temp)(this, e);
+		ret = (m_temp)(*this, e);
 		SM_ASSERT(RET_TRAN == ret);
 
 		do
@@ -247,7 +248,7 @@ public:
 		m_state = m_temp;
 	}
 
-	void dispatch(Event *const e)
+	void dispatch(Event &e)
 	{
 		StateHander t = m_state;
 		StateHander s;
@@ -262,7 +263,7 @@ public:
 		do
 		{
 			s = m_temp;
-			ret = s(this, e); 	// 调用状态处理函数
+			ret = s(*this, e); 	// 调用状态处理函数
 			if(RET_UNHANDLED == ret)
 			{
 				ret = trig(s, EMPTY_SIG);
@@ -333,11 +334,10 @@ public:
 	}
 
 	//! 层次状态机根状态
-	static int hsm_top(Attr *const hsm, Event *const e)
+	static int hsm_top(Attr &hsm, Event &e)
 	{
-		(void)hsm;
 		(void)e;
-		return hsm->ignore();
+		return hsm.ignore();
 	}
 
 private:
