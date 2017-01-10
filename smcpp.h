@@ -26,9 +26,9 @@ namespace SM
 #endif
 
 #if CONFIG_SM_DEBUG
-#define SM_ASSERT(cond) 	assert(cond)
+#define SM_ASSERT(cond)			assert(cond)
 #else
-#define SM_ASSERT(cond) 	/* NULL */
+#define SM_ASSERT(cond)			/* NULL */
 #endif
 
 typedef int Singal;
